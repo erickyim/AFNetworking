@@ -68,9 +68,21 @@ NSString * AFPercentEscapedStringFromString(NSString *string) {
 
         NSString *substring = [string substringWithRange:range];
         NSString *encoded = [substring stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacterSet];
-        [escaped appendString:encoded];
-
-        index += range.length;
+        if (encoded) {
+            [escaped appendString:encoded];
+            index += range.length;
+        } else {
+            NSMutableString *encoded2 = [NSMutableString string];
+            [substring enumerateSubstringsInRange:NSMakeRange(0, substring.length) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString * _Nullable substring2, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
+                NSString *escaped2 = [substring2 stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacterSet];
+                if (encoded) {
+                    [encoded2 appendString:escaped2];
+                }
+            }];
+            
+            [escaped appendString:encoded2];
+            index += range.length;
+        }
     }
 
 	return escaped;
